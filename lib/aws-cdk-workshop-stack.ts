@@ -9,7 +9,7 @@ export class AwsCdkWorkshopStack extends cdk.Stack {
     super(scope, id, props);
 
     const hello = new lambda.Function(this, 'helloHandler', {
-      runtime: lambda.Runtime.NODEJS_12_X,
+      runtime: lambda.Runtime.NODEJS_10_X,
       code: lambda.Code.fromAsset('lambda'),
       handler: 'hello.handler',
     });
@@ -21,6 +21,12 @@ export class AwsCdkWorkshopStack extends cdk.Stack {
     new apigw.LambdaRestApi(this, 'Endpoint', {
       handler: helloWithCounter.handler,
     });
+
+    // new apigw.LambdaRestApi(this, 'Endpoint', {
+    //   handler: hello,
+    // });
+
+
 
   }
 }

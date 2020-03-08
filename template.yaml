@@ -1,0 +1,435 @@
+Resources:
+  helloHandlerServiceRole5F8012EE:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: AwsCdkWorkshopStack/helloHandler/ServiceRole/Resource
+  helloHandlerD025ECEB:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          Ref: AssetParameters7398d95c709ff74f1a797b8889db6b3c0464a5804f00bc9000a79545b4551652S3Bucket6C167772
+        S3Key:
+          Fn::Join:
+            - ""
+            - - Fn::Select:
+                  - 0
+                  - Fn::Split:
+                      - "||"
+                      - Ref: AssetParameters7398d95c709ff74f1a797b8889db6b3c0464a5804f00bc9000a79545b4551652S3VersionKey372B64E5
+              - Fn::Select:
+                  - 1
+                  - Fn::Split:
+                      - "||"
+                      - Ref: AssetParameters7398d95c709ff74f1a797b8889db6b3c0464a5804f00bc9000a79545b4551652S3VersionKey372B64E5
+      Handler: hello.handler
+      Role:
+        Fn::GetAtt:
+          - helloHandlerServiceRole5F8012EE
+          - Arn
+      Runtime: nodejs10.x
+    DependsOn:
+      - helloHandlerServiceRole5F8012EE
+    Metadata:
+      aws:cdk:path: AwsCdkWorkshopStack/helloHandler/Resource
+      aws:asset:path: /home/vas/CDK/AWS-CDK-Workshop/lambda
+      aws:asset:property: Code
+  HelloHitCounterHitsCounterA000669B:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      KeySchema:
+        - AttributeName: path
+          KeyType: HASH
+      AttributeDefinitions:
+        - AttributeName: path
+          AttributeType: S
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:
+      aws:cdk:path: AwsCdkWorkshopStack/HelloHitCounter/HitsCounter/Resource
+  HelloHitCounterHitsCounterHandlerServiceRole486EF297:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: AwsCdkWorkshopStack/HelloHitCounter/HitsCounterHandler/ServiceRole/Resource
+  HelloHitCounterHitsCounterHandlerBADD7E93:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          Ref: AssetParameters7398d95c709ff74f1a797b8889db6b3c0464a5804f00bc9000a79545b4551652S3Bucket6C167772
+        S3Key:
+          Fn::Join:
+            - ""
+            - - Fn::Select:
+                  - 0
+                  - Fn::Split:
+                      - "||"
+                      - Ref: AssetParameters7398d95c709ff74f1a797b8889db6b3c0464a5804f00bc9000a79545b4551652S3VersionKey372B64E5
+              - Fn::Select:
+                  - 1
+                  - Fn::Split:
+                      - "||"
+                      - Ref: AssetParameters7398d95c709ff74f1a797b8889db6b3c0464a5804f00bc9000a79545b4551652S3VersionKey372B64E5
+      Handler: hitcounter.handler
+      Role:
+        Fn::GetAtt:
+          - HelloHitCounterHitsCounterHandlerServiceRole486EF297
+          - Arn
+      Runtime: nodejs12.x
+      Environment:
+        Variables:
+          DOWNSTREAM_FUNCTION_NAME:
+            Ref: helloHandlerD025ECEB
+          HITS_TABLE_NAME:
+            Ref: HelloHitCounterHitsCounterA000669B
+    DependsOn:
+      - HelloHitCounterHitsCounterHandlerServiceRole486EF297
+    Metadata:
+      aws:cdk:path: AwsCdkWorkshopStack/HelloHitCounter/HitsCounterHandler/Resource
+      aws:asset:path: /home/vas/CDK/AWS-CDK-Workshop/lambda
+      aws:asset:property: Code
+  EndpointEEF1FD8F:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: Endpoint
+    Metadata:
+      aws:cdk:path: AwsCdkWorkshopStack/Endpoint/Resource
+  EndpointDeployment318525DA7d77e12c6843c6cd5ca811ab2413f340:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId:
+        Ref: EndpointEEF1FD8F
+      Description: Automatically created by the RestApi construct
+    DependsOn:
+      - EndpointproxyANYC09721C5
+      - Endpointproxy39E2174E
+      - EndpointANY485C938B
+    Metadata:
+      aws:cdk:path: AwsCdkWorkshopStack/Endpoint/Deployment/Resource
+  EndpointDeploymentStageprodB78BEEA0:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId:
+        Ref: EndpointEEF1FD8F
+      DeploymentId:
+        Ref: EndpointDeployment318525DA7d77e12c6843c6cd5ca811ab2413f340
+      StageName: prod
+    Metadata:
+      aws:cdk:path: AwsCdkWorkshopStack/Endpoint/DeploymentStage.prod/Resource
+  EndpointCloudWatchRoleC3C64E0F:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs
+    Metadata:
+      aws:cdk:path: AwsCdkWorkshopStack/Endpoint/CloudWatchRole/Resource
+  EndpointAccountB8304247:
+    Type: AWS::ApiGateway::Account
+    Properties:
+      CloudWatchRoleArn:
+        Fn::GetAtt:
+          - EndpointCloudWatchRoleC3C64E0F
+          - Arn
+    DependsOn:
+      - EndpointEEF1FD8F
+    Metadata:
+      aws:cdk:path: AwsCdkWorkshopStack/Endpoint/Account
+  Endpointproxy39E2174E:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Fn::GetAtt:
+          - EndpointEEF1FD8F
+          - RootResourceId
+      PathPart: "{proxy+}"
+      RestApiId:
+        Ref: EndpointEEF1FD8F
+    Metadata:
+      aws:cdk:path: AwsCdkWorkshopStack/Endpoint/Default/{proxy+}/Resource
+  EndpointproxyANYApiPermissionAwsCdkWorkshopStackEndpoint483FDF45ANYproxy66690C7A:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - HelloHitCounterHitsCounterHandlerBADD7E93
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:"
+            - Ref: AWS::Partition
+            - ":execute-api:"
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":"
+            - Ref: EndpointEEF1FD8F
+            - /
+            - Ref: EndpointDeploymentStageprodB78BEEA0
+            - /*/{proxy+}
+    Metadata:
+      aws:cdk:path: AwsCdkWorkshopStack/Endpoint/Default/{proxy+}/ANY/ApiPermission.AwsCdkWorkshopStackEndpoint483FDF45.ANY..{proxy+}
+  EndpointproxyANYApiPermissionTestAwsCdkWorkshopStackEndpoint483FDF45ANYproxy5CC15223:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - HelloHitCounterHitsCounterHandlerBADD7E93
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:"
+            - Ref: AWS::Partition
+            - ":execute-api:"
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":"
+            - Ref: EndpointEEF1FD8F
+            - /test-invoke-stage/*/{proxy+}
+    Metadata:
+      aws:cdk:path: AwsCdkWorkshopStack/Endpoint/Default/{proxy+}/ANY/ApiPermission.Test.AwsCdkWorkshopStackEndpoint483FDF45.ANY..{proxy+}
+  EndpointproxyANYC09721C5:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      HttpMethod: ANY
+      ResourceId:
+        Ref: Endpointproxy39E2174E
+      RestApiId:
+        Ref: EndpointEEF1FD8F
+      AuthorizationType: NONE
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri:
+          Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - ":apigateway:"
+              - Ref: AWS::Region
+              - :lambda:path/2015-03-31/functions/
+              - Fn::GetAtt:
+                  - HelloHitCounterHitsCounterHandlerBADD7E93
+                  - Arn
+              - /invocations
+    Metadata:
+      aws:cdk:path: AwsCdkWorkshopStack/Endpoint/Default/{proxy+}/ANY/Resource
+  EndpointANYApiPermissionAwsCdkWorkshopStackEndpoint483FDF45ANY478E3E9A:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - HelloHitCounterHitsCounterHandlerBADD7E93
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:"
+            - Ref: AWS::Partition
+            - ":execute-api:"
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":"
+            - Ref: EndpointEEF1FD8F
+            - /
+            - Ref: EndpointDeploymentStageprodB78BEEA0
+            - /*/
+    Metadata:
+      aws:cdk:path: AwsCdkWorkshopStack/Endpoint/Default/ANY/ApiPermission.AwsCdkWorkshopStackEndpoint483FDF45.ANY..
+  EndpointANYApiPermissionTestAwsCdkWorkshopStackEndpoint483FDF45ANY23AAF848:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - HelloHitCounterHitsCounterHandlerBADD7E93
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:"
+            - Ref: AWS::Partition
+            - ":execute-api:"
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":"
+            - Ref: EndpointEEF1FD8F
+            - /test-invoke-stage/*/
+    Metadata:
+      aws:cdk:path: AwsCdkWorkshopStack/Endpoint/Default/ANY/ApiPermission.Test.AwsCdkWorkshopStackEndpoint483FDF45.ANY..
+  EndpointANY485C938B:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      HttpMethod: ANY
+      ResourceId:
+        Fn::GetAtt:
+          - EndpointEEF1FD8F
+          - RootResourceId
+      RestApiId:
+        Ref: EndpointEEF1FD8F
+      AuthorizationType: NONE
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri:
+          Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - ":apigateway:"
+              - Ref: AWS::Region
+              - :lambda:path/2015-03-31/functions/
+              - Fn::GetAtt:
+                  - HelloHitCounterHitsCounterHandlerBADD7E93
+                  - Arn
+              - /invocations
+    Metadata:
+      aws:cdk:path: AwsCdkWorkshopStack/Endpoint/Default/ANY/Resource
+  CDKMetadata:
+    Type: AWS::CDK::Metadata
+    Properties:
+      Modules: aws-cdk=1.27.0,@aws-cdk/assets=1.27.0,@aws-cdk/aws-apigateway=1.27.0,@aws-cdk/aws-applicationautoscaling=1.27.0,@aws-cdk/aws-autoscaling=1.27.0,@aws-cdk/aws-autoscaling-common=1.27.0,@aws-cdk/aws-autoscaling-hooktargets=1.27.0,@aws-cdk/aws-cloudformation=1.27.0,@aws-cdk/aws-cloudwatch=1.27.0,@aws-cdk/aws-dynamodb=1.27.0,@aws-cdk/aws-ec2=1.27.0,@aws-cdk/aws-ecr=1.27.0,@aws-cdk/aws-ecr-assets=1.27.0,@aws-cdk/aws-ecs=1.27.0,@aws-cdk/aws-elasticloadbalancingv2=1.27.0,@aws-cdk/aws-events=1.27.0,@aws-cdk/aws-iam=1.27.0,@aws-cdk/aws-kms=1.27.0,@aws-cdk/aws-lambda=1.27.0,@aws-cdk/aws-logs=1.27.0,@aws-cdk/aws-s3=1.27.0,@aws-cdk/aws-s3-assets=1.27.0,@aws-cdk/aws-servicediscovery=1.27.0,@aws-cdk/aws-sns=1.27.0,@aws-cdk/aws-sns-subscriptions=1.27.0,@aws-cdk/aws-sqs=1.27.0,@aws-cdk/aws-ssm=1.27.0,@aws-cdk/aws-stepfunctions=1.27.0,@aws-cdk/aws-stepfunctions-tasks=1.27.0,@aws-cdk/core=1.27.0,@aws-cdk/custom-resources=1.27.0,@aws-cdk/cx-api=1.27.0,@aws-cdk/region-info=1.27.0,jsii-runtime=node.js/v11.8.0
+    Condition: CDKMetadataAvailable
+Parameters:
+  AssetParameters7398d95c709ff74f1a797b8889db6b3c0464a5804f00bc9000a79545b4551652S3Bucket6C167772:
+    Type: String
+    Description: S3 bucket for asset "7398d95c709ff74f1a797b8889db6b3c0464a5804f00bc9000a79545b4551652"
+  AssetParameters7398d95c709ff74f1a797b8889db6b3c0464a5804f00bc9000a79545b4551652S3VersionKey372B64E5:
+    Type: String
+    Description: S3 key for asset version "7398d95c709ff74f1a797b8889db6b3c0464a5804f00bc9000a79545b4551652"
+  AssetParameters7398d95c709ff74f1a797b8889db6b3c0464a5804f00bc9000a79545b4551652ArtifactHash9AD1B85C:
+    Type: String
+    Description: Artifact hash for asset "7398d95c709ff74f1a797b8889db6b3c0464a5804f00bc9000a79545b4551652"
+Outputs:
+  Endpoint8024A810:
+    Value:
+      Fn::Join:
+        - ""
+        - - https://
+          - Ref: EndpointEEF1FD8F
+          - .execute-api.
+          - Ref: AWS::Region
+          - "."
+          - Ref: AWS::URLSuffix
+          - /
+          - Ref: EndpointDeploymentStageprodB78BEEA0
+          - /
+Conditions:
+  CDKMetadataAvailable:
+    Fn::Or:
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ca-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-northwest-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-central-1
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-3
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - me-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - sa-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-west-2
+
