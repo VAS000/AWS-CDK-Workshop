@@ -18,6 +18,8 @@ export class HitCounter extends cdk.Construct {
 				name: 'path',
 				type: dynamoDB.AttributeType.STRING,
 			},
+			readCapacity: 1,
+			writeCapacity: 1,
 		});
 
 		this.handler = new lambda.Function(this, 'HitsCounterHandler', {
@@ -29,5 +31,8 @@ export class HitCounter extends cdk.Construct {
 				HITS_TABLE_NAME: table.tableName,
 			}
 		});
+
+		table.grantReadWriteData(this.handler);
+		props.downstream.grantInvoke(this.handler);
 	}
 }
